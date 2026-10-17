@@ -8,12 +8,38 @@
 
 | Metric | Count |
 |---|---|
-| Total prompts | 2 |
+| Total prompts | 3 |
 | Total reinforcements | 0 |
 | Requirements missed | 0 |
 
 ### Reinforcements by Requirement
 *(none yet)*
+
+---
+
+## How to Run
+
+### Development Server
+```bash
+# Navigate into the project folder
+cd ragebait
+
+# Install dependencies (if cloning fresh)
+npm install
+
+# Start development server
+npm run dev
+```
+Open [http://localhost:5173](http://localhost:5173) in your browser.
+
+### Production Build & Preview
+```bash
+# Build production bundle
+npm run build
+
+# Preview production build locally
+npm run preview
+```
 
 ---
 
@@ -80,4 +106,21 @@
 
 ---
 
-*End of log entry 002*
+### [003] — FEEDBACK
+**User message (verbatim):**
+> "how to run this website"
+
+**What AI did:**
+- Added a "How to Run" section with instructions for `npm run dev` and `npm run build` / `npm run preview`
+- Incremented prompt counter to 3
+- Appended log entry [003] to README.md
+- Committed README.md change to git history
+- Pushed repository to remote `https://github.com/ArvyKrane/attack_on_token_round2.git`
+
+**Files changed:** `README.md`
+
+**Tag:** FEEDBACK
+
+---
+
+*End of log entry 003*
