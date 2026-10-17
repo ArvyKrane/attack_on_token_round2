@@ -349,5 +349,29 @@ export function playSpaceWhoosh(): void {
   }
 }
 
+/** Slap / spank whip sound with comedic pitch drop */
+export function playSpank(): void {
+  unlockAudio();
+  if (_muted) return;
+  try {
+    noise(0.65, 0.08);
+    const ctx = getCtx();
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.8, now());
+    g.gain.exponentialRampToValueAtTime(0.001, now() + 0.3);
+    g.connect(masterGain!);
+
+    const o = ctx.createOscillator();
+    o.type = 'sawtooth';
+    o.frequency.setValueAtTime(320, now());
+    o.frequency.exponentialRampToValueAtTime(110, now() + 0.3);
+    o.connect(g);
+    o.start(now());
+    o.stop(now() + 0.3);
+  } catch (e) {
+    console.warn('Spank sound error:', e);
+  }
+}
+
 
 

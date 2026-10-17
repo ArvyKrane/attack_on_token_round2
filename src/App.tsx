@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 // Styles
@@ -42,8 +42,22 @@ import {
   playVineBoom,
   playPop,
   playDing,
+  playSpank,
+  speakRoast,
   toggleMute,
 } from './lib/sound';
+
+const PENGUIN_HIT_LINES = [
+  "Ah~ hit me harder... daddy? 😳🫦",
+  "Harder! Treat my kernel like an unhandled promise rejection... 🥵",
+  "Mmm... don't stop, my CPU temperature is peaking 🔥💦",
+  "Spank my Linux distro harder, senpai~ 🫣",
+  "Is that all you got? Allocate more buffer overflow right into me 🥴",
+  "Yamete kudasai! (Keep slapping though, I like the pain...) 😏",
+  "Harder daddy... my swap memory is getting completely soaked 🫦",
+  "Hit me until I throw a SIGSEGV core dump... please 🥵",
+  "Oof~ your clicks feel so dominant... do it again 😈",
+];
 
 export default function App() {
   const [entered, setEntered] = useState(false);
@@ -52,6 +66,36 @@ export default function App() {
   const [scrollInvertActive, setScrollInvertActive] = useState(false);
   const [missionFailed, setMissionFailed] = useState(false);
   const [bypassNotice, setBypassNotice] = useState<string | null>(null);
+
+  // Penguin Avatar slap/hit state
+  const [penguinHitBubble, setPenguinHitBubble] = useState<string | null>(null);
+  const [penguinHitCount, setPenguinHitCount] = useState(0);
+  const penguinTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handlePenguinHit = () => {
+    unlockAudio();
+    playSpank();
+    if (Math.random() > 0.5) playVineBoom();
+    drainAura(4);
+
+    const nextCount = penguinHitCount + 1;
+    setPenguinHitCount(nextCount);
+
+    // Lead with "Ah~ hit me harder... daddy? 😳🫦" on first click, then cycle/randomize
+    const lineIndex = nextCount === 1 ? 0 : Math.floor(Math.random() * PENGUIN_HIT_LINES.length);
+    const line = PENGUIN_HIT_LINES[lineIndex];
+    setPenguinHitBubble(line);
+
+    // Funny robot voice whisper
+    if (nextCount % 2 === 1) {
+      speakRoast("Hit me harder daddy");
+    }
+
+    if (penguinTimerRef.current) clearTimeout(penguinTimerRef.current);
+    penguinTimerRef.current = setTimeout(() => {
+      setPenguinHitBubble(null);
+    }, 3200);
+  };
 
   const {
     aura,
@@ -241,29 +285,103 @@ export default function App() {
                   background: 'rgba(15, 17, 26, 0.65)',
                 }}
               >
-                {/* Avatar with live status dot */}
+                {/* Avatar with live status dot and spicy speech bubble */}
                 <div style={{ position: 'relative', marginBottom: '18px' }}>
+                  {/* Floating Speech Bubble */}
+                  <AnimatePresence>
+                    {penguinHitBubble && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 12, scale: 0.8 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -10, scale: 0.8 }}
+                        transition={{ type: 'spring', stiffness: 500, damping: 22 }}
+                        style={{
+                          position: 'absolute',
+                          bottom: 'calc(100% + 14px)',
+                          left: '50%',
+                          transform: 'translateX(-50%)',
+                          zIndex: 60,
+                          minWidth: '220px',
+                          maxWidth: '320px',
+                          padding: '10px 14px',
+                          borderRadius: '16px',
+                          background: 'rgba(25, 10, 28, 0.96)',
+                          border: '2px solid #ff007f',
+                          boxShadow: '0 0 25px rgba(255, 0, 127, 0.55), inset 0 0 12px rgba(255, 0, 127, 0.25)',
+                          textAlign: 'center',
+                          pointerEvents: 'none',
+                        }}
+                      >
+                        <p
+                          className="font-display font-black text-sm"
+                          style={{
+                            color: '#ff77c2',
+                            textShadow: '0 0 10px rgba(255, 119, 194, 0.7)',
+                            lineHeight: 1.35,
+                          }}
+                        >
+                          {penguinHitBubble}
+                        </p>
+                        {penguinHitCount > 1 && (
+                          <div
+                            style={{
+                              marginTop: '4px',
+                              fontSize: '0.65rem',
+                              fontFamily: 'monospace',
+                              color: '#f43f5e',
+                              letterSpacing: '0.05em',
+                            }}
+                          >
+                            💦 Masochist Level: {penguinHitCount} Slaps Taken
+                          </div>
+                        )}
+                        {/* Comic Bubble Pointer Caret */}
+                        <div
+                          style={{
+                            position: 'absolute',
+                            bottom: '-9px',
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            width: 0,
+                            height: 0,
+                            borderLeft: '9px solid transparent',
+                            borderRight: '9px solid transparent',
+                            borderTop: '9px solid #ff007f',
+                          }}
+                        />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
                   <motion.div
-                    whileHover={{ scale: 1.08, rotate: 10 }}
-                    onClick={() => {
-                      unlockAudio();
-                      playVineBoom();
-                      drainAura(4);
-                    }}
+                    whileHover={{ scale: 1.08, rotate: 6 }}
+                    whileTap={{ scale: 0.86, rotate: -12 }}
+                    animate={penguinHitBubble ? {
+                      scale: [1, 1.15, 0.92, 1.08, 1],
+                      rotate: [0, -10, 10, -5, 0],
+                    } : {}}
+                    transition={{ duration: 0.4 }}
+                    onClick={handlePenguinHit}
                     style={{
                       width: '90px',
                       height: '90px',
                       borderRadius: '50%',
-                      background: 'radial-gradient(circle, #39ff14 0%, #0a0b10 80%)',
-                      border: '2px solid #39ff14',
+                      background: penguinHitBubble
+                        ? 'radial-gradient(circle, #ff007f 0%, #1a0815 80%)'
+                        : 'radial-gradient(circle, #39ff14 0%, #0a0b10 80%)',
+                      border: penguinHitBubble ? '2px solid #ff007f' : '2px solid #39ff14',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       fontSize: '2.8rem',
                       cursor: 'pointer',
-                      boxShadow: '0 0 24px rgba(57, 255, 20, 0.3)',
+                      boxShadow: penguinHitBubble
+                        ? '0 0 30px rgba(255, 0, 127, 0.7)'
+                        : '0 0 24px rgba(57, 255, 20, 0.3)',
+                      transition: 'background 0.3s, border-color 0.3s, box-shadow 0.3s',
+                      userSelect: 'none',
                     }}
-                    title="Developer Avatar"
+                    title="Developer Avatar (Click to slap)"
                   >
                     🐧
                   </motion.div>
@@ -275,13 +393,15 @@ export default function App() {
                       width: '14px',
                       height: '14px',
                       borderRadius: '50%',
-                      backgroundColor: '#39ff14',
+                      backgroundColor: penguinHitBubble ? '#ff007f' : '#39ff14',
                       border: '2px solid #050508',
-                      boxShadow: '0 0 8px #39ff14',
+                      boxShadow: penguinHitBubble ? '0 0 10px #ff007f' : '0 0 8px #39ff14',
+                      transition: 'all 0.3s',
                     }}
-                    title="Online & Ready to Troll"
+                    title={penguinHitBubble ? "Blushing & Begging" : "Online & Ready to Troll"}
                   />
                 </div>
+
 
                 <h1
                   className="font-display"
