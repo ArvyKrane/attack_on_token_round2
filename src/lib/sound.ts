@@ -266,4 +266,88 @@ export function playSinisterChime(): void {
   }
 }
 
+/** Among Us Emergency Meeting Klaxon Siren & Slap */
+export function playEmergencyMeetingSiren(): void {
+  unlockAudio();
+  if (_muted) return;
+  try {
+    const ctx = getCtx();
+    // Heavy button slam
+    const slam = ctx.createGain();
+    slam.gain.setValueAtTime(0.9, now());
+    slam.gain.exponentialRampToValueAtTime(0.0001, now() + 0.4);
+    slam.connect(masterGain!);
+    const slamOsc = ctx.createOscillator();
+    slamOsc.type = 'sawtooth';
+    slamOsc.frequency.setValueAtTime(120, now());
+    slamOsc.frequency.exponentialRampToValueAtTime(40, now() + 0.4);
+    slamOsc.connect(slam);
+    slamOsc.start(now());
+    slamOsc.stop(now() + 0.4);
+
+    // 2-tone Klaxon Siren
+    const tones = [880, 660, 880, 660];
+    tones.forEach((freq, idx) => {
+      setTimeout(() => {
+        if (_muted) return;
+        osc('sawtooth', freq, 0.22, 0.45);
+      }, 150 + idx * 220);
+    });
+  } catch (e) {
+    console.warn('Emergency meeting siren error:', e);
+  }
+}
+
+/** Mechanical voting stamp sound */
+export function playVoteStamp(): void {
+  unlockAudio();
+  if (_muted) return;
+  try {
+    const ctx = getCtx();
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.7, now());
+    g.gain.exponentialRampToValueAtTime(0.001, now() + 0.25);
+    g.connect(masterGain!);
+
+    const o = ctx.createOscillator();
+    o.type = 'triangle';
+    o.frequency.setValueAtTime(260, now());
+    o.frequency.exponentialRampToValueAtTime(50, now() + 0.25);
+    o.connect(g);
+    o.start(now());
+    o.stop(now() + 0.25);
+
+    setTimeout(() => {
+      osc('sine', 1400, 0.15, 0.2);
+    }, 40);
+  } catch (e) {
+    console.warn('Vote stamp error:', e);
+  }
+}
+
+/** Deep space ejection whoosh */
+export function playSpaceWhoosh(): void {
+  unlockAudio();
+  if (_muted) return;
+  try {
+    noise(0.4, 0.8);
+    const ctx = getCtx();
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.4, now());
+    g.gain.exponentialRampToValueAtTime(0.001, now() + 1.2);
+    g.connect(masterGain!);
+
+    const o = ctx.createOscillator();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(180, now());
+    o.frequency.exponentialRampToValueAtTime(45, now() + 1.2);
+    o.connect(g);
+    o.start(now());
+    o.stop(now() + 1.2);
+  } catch (e) {
+    console.warn('Space whoosh error:', e);
+  }
+}
+
+
 
