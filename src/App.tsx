@@ -66,6 +66,7 @@ export default function App() {
     spawnFakeError,
     bypassPranks,
     surrender,
+    visitorName,
   } = useChaos();
 
   // Konami code P2
@@ -206,6 +207,10 @@ export default function App() {
                 <div style={{ flex: 1, minWidth: '220px' }}>
                   <p style={{ color: '#f5f5f5', marginBottom: '4px' }}>
                     <span style={{ color: '#39ff14' }}>uptime:</span> 420 hrs, 69 mins
+                  </p>
+                  <p style={{ color: '#f5f5f5', marginBottom: '4px' }}>
+                    <span style={{ color: '#ff1493' }}>active_visitor:</span>{' '}
+                    <span style={{ color: '#ff1493', fontWeight: 700 }}>{visitorName}</span>
                   </p>
                   <p style={{ color: '#f5f5f5', marginBottom: '4px' }}>
                     <span style={{ color: '#39ff14' }}>aura_status:</span>{' '}

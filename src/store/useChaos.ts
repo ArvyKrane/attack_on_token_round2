@@ -68,6 +68,10 @@ export interface ChaosState {
   showRickroll: () => void;
   hideRickroll: () => void;
 
+  // Visitor Name
+  visitorName: string;
+  setVisitorName: (name: string) => void;
+
   // Emoji rain
   emojiRainActive: boolean;
   triggerEmojiRain: () => void;
@@ -181,6 +185,9 @@ export const useChaos = create<ChaosState>((set, get) => ({
   rickrollVisible: false,
   showRickroll: () => set({ rickrollVisible: true }),
   hideRickroll: () => set({ rickrollVisible: false }),
+
+  visitorName: 'noob',
+  setVisitorName: (name: string) => set({ visitorName: name }),
 
   emojiRainActive: false,
   triggerEmojiRain: () => {
