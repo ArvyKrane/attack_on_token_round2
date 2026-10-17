@@ -1,18 +1,19 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useChaos } from '../store/useChaos';
-import { unlockAudio, playError } from '../lib/sound';
+import { unlockAudio, playError, playVineBoom, playRickrollMelody } from '../lib/sound';
 
 type Phase = 'idle' | 'loading' | 'rickroll';
 
 export default function RickrollTrap() {
   const [phase, setPhase] = useState<Phase>('idle');
   const [progress, setProgress] = useState(0);
-  const { showRickroll, drainAura } = useChaos();
+  const { showRickroll, hideRickroll, rickrollVisible, drainAura } = useChaos();
 
   const handleDownloadClick = () => {
     unlockAudio();
     drainAura(15);
+    playVineBoom();
     setPhase('loading');
     setProgress(0);
   };
@@ -22,102 +23,238 @@ export default function RickrollTrap() {
 
     let val = 0;
     const interval = setInterval(() => {
-      // Accelerate to 99 then stall
       if (val < 99) {
-        val = Math.min(99, val + Math.random() * 12);
+        val = Math.min(99, val + Math.random() * 14);
         setProgress(val);
       } else {
         clearInterval(interval);
-        // Stall at 99 for 1.5s then rickroll
+        // Stall at 99 for 1.2s then rickroll
         setTimeout(() => {
           playError();
+          playRickrollMelody();
           setPhase('rickroll');
           showRickroll();
-        }, 1500);
+        }, 1200);
       }
-    }, 200);
+    }, 180);
 
     return () => clearInterval(interval);
   }, [phase, showRickroll]);
 
-  const { rickrollVisible, hideRickroll } = useChaos();
-
   const handleSkip = () => {
-    // Skip button restarts the video (just hides & re-shows iframe)
+    // Fake skip: restart the rickroll video!
+    playError();
     hideRickroll();
-    setTimeout(() => showRickroll(), 50);
+    setTimeout(() => showRickroll(), 80);
+  };
+
+  const handleClose = () => {
+    hideRickroll();
+    setPhase('idle');
   };
 
   return (
     <>
       {/* Download button */}
-      {phase === 'idle' && (
-        <motion.button
-          onClick={handleDownloadClick}
-          whileHover={{ scale: 1.04 }}
-          whileTap={{ scale: 0.96 }}
-          className="flex items-center gap-2 px-6 py-3 rounded-lg glass-card font-display font-semibold chroma-hover"
-          style={{ border: '1px solid var(--color-acid)', color: 'var(--color-acid)' }}
-        >
-          <span>📄</span>
-          <span>Download my resume.pdf</span>
-        </motion.button>
-      )}
+      <motion.button
+        onClick={handleDownloadClick}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className="glass-card"
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '8px',
+          padding: '12px 24px',
+          borderRadius: '9999px',
+          fontFamily: 'Space Grotesk, sans-serif',
+          fontWeight: 700,
+          border: '1px solid #39ff14',
+          color: '#39ff14',
+          background: 'rgba(57, 255, 20, 0.08)',
+          boxShadow: '0 0 15px rgba(57, 255, 20, 0.2)',
+          cursor: 'pointer',
+        }}
+      >
+        <span>📄</span>
+        <span>Download Resume.pdf</span>
+      </motion.button>
 
-      {/* Fake loading bar */}
+      {/* Fake loading bar modal */}
       <AnimatePresence>
         {phase === 'loading' && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[9000] flex items-center justify-center bg-black/90"
+            style={{
+              position: 'fixed',
+              inset: 0,
+              zIndex: 9000,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: 'rgba(5, 5, 8, 0.95)',
+              backdropFilter: 'blur(10px)',
+              padding: '20px',
+            }}
           >
-            <div className="glass-card p-10 text-center max-w-md w-full mx-4" style={{ border: '1px solid var(--color-acid)' }}>
-              <p className="font-pixel text-acid mb-6" style={{ fontSize: 'var(--text-xs)', color: 'var(--color-acid)' }}>
-                Preparing your totally real resume...
+            <div
+              className="glass-card"
+              style={{
+                padding: '36px',
+                textAlign: 'center',
+                maxWidth: '460px',
+                width: '100%',
+                border: '1px solid #39ff14',
+                boxShadow: '0 0 30px rgba(57, 255, 20, 0.25)',
+              }}
+            >
+              <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>⏳</div>
+              <p
+                className="font-pixel"
+                style={{ fontSize: '0.8rem', color: '#39ff14', marginBottom: '20px', lineHeight: 1.6 }}
+              >
+                Generating Certified 100% Real Resume.pdf...
               </p>
-              <div className="w-full h-3 rounded-full bg-white/10 overflow-hidden mb-3">
+              <div
+                style={{
+                  width: '100%',
+                  height: '14px',
+                  borderRadius: '9999px',
+                  background: 'rgba(255,255,255,0.1)',
+                  overflow: 'hidden',
+                  marginBottom: '14px',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                }}
+              >
                 <motion.div
-                  className="h-full rounded-full"
-                  style={{ background: 'var(--color-acid)', width: `${progress}%` }}
+                  style={{
+                    height: '100%',
+                    borderRadius: '9999px',
+                    background: 'linear-gradient(90deg, #39ff14, #ff1493)',
+                    width: `${progress}%`,
+                  }}
                   animate={{ width: `${progress}%` }}
-                  transition={{ type: 'spring', stiffness: 100 }}
                 />
               </div>
-              <p className="text-muted text-sm" style={{ color: 'var(--color-muted)' }}>
-                {progress < 99 ? `${Math.floor(progress)}%` : '99% — finalizing…'}
+              <p
+                style={{
+                  fontSize: '0.85rem',
+                  fontFamily: 'Space Grotesk, sans-serif',
+                  color: 'rgba(245, 245, 245, 0.7)',
+                }}
+              >
+                {progress < 99 ? `${Math.floor(progress)}% — crunching clout metrics...` : '⚠️ 99% — Verifying rizz levels (stalling)...'}
               </p>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Rickroll fullscreen iframe */}
+      {/* Rickroll fullscreen iframe modal */}
       <AnimatePresence>
         {rickrollVisible && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[9001] bg-black flex flex-col"
+            style={{
+              position: 'fixed',
+              inset: 0,
+              zIndex: 9500,
+              backgroundColor: '#000',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
           >
+            {/* Top header bar */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '12px 24px',
+                background: '#0a0a10',
+                borderBottom: '1px solid rgba(255,20,147,0.4)',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span className="font-pixel" style={{ color: '#ff1493', fontSize: '0.8rem' }}>
+                  🎵 RICKROLLED.EXE
+                </span>
+                <span style={{ color: 'rgba(245,245,245,0.5)', fontSize: '0.75rem' }}>
+                  (you really thought you were getting a pdf?)
+                </span>
+              </div>
+              <button
+                onClick={handleClose}
+                style={{
+                  background: 'rgba(255,255,255,0.1)',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  color: '#fff',
+                  borderRadius: '6px',
+                  padding: '4px 12px',
+                  fontSize: '0.8rem',
+                  cursor: 'pointer',
+                }}
+              >
+                Close ✕
+              </button>
+            </div>
+
+            {/* Video player */}
             <iframe
-              src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&rel=0"
-              allow="autoplay; fullscreen"
+              src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&rel=0&controls=1"
+              allow="autoplay; fullscreen; encrypted-media"
               allowFullScreen
-              className="flex-1 w-full border-0"
-              title="Definitely your resume"
+              style={{ flex: 1, width: '100%', height: '100%', border: 'none' }}
+              title="Official Resume Video"
             />
-            <div className="flex justify-center p-4 gap-4 bg-black">
+
+            {/* Bottom Troll Actions */}
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '16px',
+                padding: '14px',
+                background: '#050508',
+              }}
+            >
               <motion.button
                 onClick={handleSkip}
-                className="px-6 py-2 rounded text-sm font-display"
-                style={{ background: 'var(--color-surface)', color: 'var(--color-muted)', border: '1px solid var(--color-border)' }}
                 whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                style={{
+                  background: '#ff1493',
+                  color: '#fff',
+                  border: 'none',
+                  padding: '8px 24px',
+                  borderRadius: '9999px',
+                  fontFamily: 'Space Grotesk, sans-serif',
+                  fontWeight: 700,
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  boxShadow: '0 0 15px rgba(255,20,147,0.5)',
+                }}
               >
-                Skip ▶
+                Skip Video ▶ (troll restart)
               </motion.button>
+              <button
+                onClick={handleClose}
+                style={{
+                  background: 'transparent',
+                  color: 'rgba(245,245,245,0.5)',
+                  border: 'none',
+                  fontSize: '0.8rem',
+                  textDecoration: 'underline',
+                  cursor: 'pointer',
+                }}
+              >
+                I have suffered enough, take me back
+              </button>
             </div>
           </motion.div>
         )}
