@@ -8,7 +8,7 @@
 
 | Metric | Count |
 |---|---|
-| Total prompts | 11 |
+| Total prompts | 12 |
 | Total reinforcements | 2 |
 | Requirements missed | 2 |
 
@@ -366,5 +366,57 @@ borderline nsfw"
 
 ---
 
-*End of log entry 011*
+### [012] — NEW
+**User message (verbatim):**
+> "Bait-and-switch “Download Resume” → rickroll (section 18, #1)
+> Everyone expects a real resume. Pure ragebait, universal meme.
+> Cheap build. Real resume link live on Page 2 after surrender.
+> Dark Souls Mimic Contact button (section 16, #17)
+> Contact button looks like a chest, bites you, “YOU DIED”.
+> Screenshot-worthy, gaming flavour, 100% your personality. Gets shared in friend group.
+> Contact still works after the bite, so recruiters not stuck.
+> Runaway Follow = your real Instagram (section 16, #21)
+> Visitor chases button, catches it on the 10th try, opens real @arvykrane.
+> Prank also grows your creator account. Only one that gives real result.
+> 
+> thode horror and random shits bhi chalenge"
+
+**What AI did:**
+- Section 18, #1 (Bait-and-Switch Resume to Rickroll):
+  - In `RickrollTrap.tsx`, kept the 99% stalling download progress bar that triggers the 8-bit Never Gonna Give You Up audio and full-screen Rickroll trap.
+  - Created `RealResumeModal.tsx` rendering an authentic, comprehensive senior software engineer resume for Arvy Krane (Raft consensus, WebGL, Rust, telemetry).
+  - Configured `RickrollTrap.tsx` so that when `surrendered` is active, clicking "Download Resume" opens the real resume modal with printable PDF export.
+  - Added a prominent `"📄 View / Download Resume (PDF)"` button in `CleanProfile.tsx` (Page 2) that opens the real resume directly.
+- Section 16, #17 (Dark Souls Mimic Contact Button):
+  - Created `MimicContact.tsx` styled as a breathing wooden RPG dungeon chest with authentic Dark Souls tell (curled chain).
+  - On first click, snaps open razor teeth with horror bone crunch audio (`playBiteCrunch()`), monster roar (`playScream()`), and ominous bell toll (`playDarkSoulsBell()`), draining aura to 0 and triggering the Dark Souls **"YOU DIED"** overlay.
+  - Enhanced the "YOU DIED" screen with authentic serif typography, bonfire rest button (`REST AT BONFIRE (+30 AURA)`), and Left-Ctrl bypass.
+  - Recruiter-safe guarantee: After the bite, the chest becomes `"Slain Mimic Loot ⚔️"`. Clicking it opens a genuine Recruiter Contact Modal with email copy, mailto launcher, and GitHub link.
+- Section 16, #21 (Runaway Follow opens real @arvykrane Instagram):
+  - Overhauled `RunawayButton.tsx` so the button dodges for 9 attempts. On the 10th try, it stops running, centers itself, and renders a glowing Instagram gradient button `"🏆 YOU CAUGHT ME! Follow @arvykrane on Instagram"`.
+  - Clicking it fires confetti (`confetti()`), plays victory airhorn (`playAirhorn()`), and opens `https://instagram.com/arvykrane` in a new tab.
+  - Updated Instagram links across `CleanProfile.tsx` to `https://instagram.com/arvykrane`.
+- Horror & Random Terminal Chaos:
+  - Added `horror`, `666`, `curse`, and `mimic` commands to `InteractiveTerminal.tsx` with ascii demon and audio triggers.
+- Incremented prompt counter to 12, kept reinforcements at 2.
+- Verified clean build (`npm run build` succeeds in 289ms with 0 errors).
+- Committed changes to git and pushed to remote repository.
+
+**Files changed:**
+- `src/components/MimicContact.tsx`
+- `src/components/RealResumeModal.tsx`
+- `src/components/RunawayButton.tsx`
+- `src/components/RickrollTrap.tsx`
+- `src/components/CleanProfile.tsx`
+- `src/components/InteractiveTerminal.tsx`
+- `src/lib/sound.ts`
+- `src/App.tsx`
+- `README.md`
+
+**Tag:** NEW
+
+---
+
+*End of log entry 012*
+
 

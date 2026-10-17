@@ -2,16 +2,22 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useChaos } from '../store/useChaos';
 import { unlockAudio, playError, playVineBoom, playRickrollMelody } from '../lib/sound';
+import RealResumeModal from './RealResumeModal';
 
 type Phase = 'idle' | 'loading' | 'rickroll';
 
 export default function RickrollTrap() {
   const [phase, setPhase] = useState<Phase>('idle');
   const [progress, setProgress] = useState(0);
-  const { showRickroll, hideRickroll, rickrollVisible, drainAura } = useChaos();
+  const [realResumeOpen, setRealResumeOpen] = useState(false);
+  const { showRickroll, hideRickroll, rickrollVisible, drainAura, surrendered } = useChaos();
 
   const handleDownloadClick = () => {
     unlockAudio();
+    if (surrendered) {
+      setRealResumeOpen(true);
+      return;
+    }
     drainAura(15);
     playVineBoom();
     setPhase('loading');
@@ -259,6 +265,10 @@ export default function RickrollTrap() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Real Candidate Resume Modal (after surrender / safe mode) */}
+      <RealResumeModal isOpen={realResumeOpen} onClose={() => setRealResumeOpen(false)} />
     </>
   );
 }
+

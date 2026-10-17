@@ -373,5 +373,53 @@ export function playSpank(): void {
   }
 }
 
+/** Dark Souls Mimic crunch/bite sound */
+export function playBiteCrunch(): void {
+  unlockAudio();
+  if (_muted) return;
+  try {
+    noise(0.85, 0.25);
+    const ctx = getCtx();
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.9, now());
+    g.gain.exponentialRampToValueAtTime(0.001, now() + 0.45);
+    g.connect(masterGain!);
+
+    const o = ctx.createOscillator();
+    o.type = 'sawtooth';
+    o.frequency.setValueAtTime(140, now());
+    o.frequency.exponentialRampToValueAtTime(35, now() + 0.45);
+    o.connect(g);
+    o.start(now());
+    o.stop(now() + 0.45);
+  } catch (e) {
+    console.warn('Bite crunch error:', e);
+  }
+}
+
+/** Dark Souls ominous church bell / gong toll */
+export function playDarkSoulsBell(): void {
+  unlockAudio();
+  if (_muted) return;
+  try {
+    const ctx = getCtx();
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.85, now());
+    g.gain.exponentialRampToValueAtTime(0.0001, now() + 3.2);
+    g.connect(masterGain!);
+
+    [110, 164.81, 220, 207.65].forEach((freq, idx) => {
+      const o = ctx.createOscillator();
+      o.type = idx % 2 === 0 ? 'sine' : 'triangle';
+      o.frequency.setValueAtTime(freq, now());
+      o.connect(g);
+      o.start(now());
+      o.stop(now() + 3.2);
+    });
+  } catch (e) {
+    console.warn('Dark Souls bell error:', e);
+  }
+}
+
 
 

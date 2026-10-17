@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { unlockAudio, playScream } from '../lib/sound';
+import confetti from 'canvas-confetti';
+import { unlockAudio, playAirhorn } from '../lib/sound';
 
 const BUTTON_TEXTS = [
   '+ Follow Developer',
@@ -37,6 +38,11 @@ export default function RunawayButton({ onAttempt }: RunawayButtonProps) {
     setAttempts(newAttempts);
     setLabel(BUTTON_TEXTS[Math.min(newAttempts, BUTTON_TEXTS.length - 1)]);
 
+    if (newAttempts >= 10) {
+      setPos({ x: 0, y: 0 });
+      return;
+    }
+
     const container = containerRef.current;
     if (!container) return;
 
@@ -64,6 +70,15 @@ export default function RunawayButton({ onAttempt }: RunawayButtonProps) {
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     if (escaped) return;
     e.preventDefault();
+    const newAttempts = attempts + 1;
+    setAttempts(newAttempts);
+    setLabel(BUTTON_TEXTS[Math.min(newAttempts, BUTTON_TEXTS.length - 1)]);
+
+    if (newAttempts >= 10) {
+      setPos({ x: 0, y: 0 });
+      return;
+    }
+
     const container = containerRef.current;
     if (!container) return;
     const W = container.clientWidth;
@@ -71,18 +86,15 @@ export default function RunawayButton({ onAttempt }: RunawayButtonProps) {
     const nx = Math.random() * (W - 140);
     const ny = Math.random() * (H - 50);
     setPos({ x: nx - W / 2, y: ny - H / 2 });
-    setAttempts(a => {
-      const na = a + 1;
-      setLabel(BUTTON_TEXTS[Math.min(na, BUTTON_TEXTS.length - 1)]);
-      return na;
-    });
     onAttempt();
-  }, [escaped, onAttempt]);
+  }, [attempts, escaped, onAttempt]);
 
-  const handleClick = useCallback(() => {
-    if (!escaped) return;
-    playScream();
-  }, [escaped]);
+  const handleInstagramClick = useCallback(() => {
+    unlockAudio();
+    playAirhorn();
+    confetti({ particleCount: 75, spread: 80, origin: { y: 0.7 } });
+    window.open('https://instagram.com/arvykrane', '_blank');
+  }, []);
 
   return (
     <div
@@ -110,30 +122,39 @@ export default function RunawayButton({ onAttempt }: RunawayButtonProps) {
           >
             <p
               className="font-pixel"
-              style={{ fontSize: '0.8rem', color: '#ff1493', lineHeight: 1.6 }}
+              style={{ fontSize: '0.78rem', color: '#ff77c2', lineHeight: 1.6, marginBottom: '8px' }}
             >
-              nah you're not worthy to follow 💀
+              🎉 RESPECT! You actually caught me on try 10!
             </p>
             <motion.button
-              onClick={handleClick}
-              animate={{ scale: [1, 0.95, 1] }}
-              transition={{ repeat: Infinity, duration: 2 }}
+              onClick={handleInstagramClick}
+              whileHover={{ scale: 1.06 }}
+              whileTap={{ scale: 0.95 }}
+              animate={{ scale: [1, 1.03, 1] }}
+              transition={{ repeat: Infinity, duration: 1.6 }}
               style={{
-                marginTop: '8px',
-                padding: '6px 16px',
+                padding: '10px 24px',
                 borderRadius: '9999px',
-                border: '1px solid rgba(255,20,147,0.3)',
-                color: '#ff1493',
-                fontSize: '0.75rem',
-                cursor: 'not-allowed',
-                background: 'transparent',
-                opacity: 0.5,
+                fontFamily: 'Space Grotesk, sans-serif',
+                fontWeight: 700,
+                color: '#ffffff',
+                background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)',
+                boxShadow: '0 0 25px rgba(220, 39, 67, 0.6)',
+                fontSize: '0.9rem',
+                cursor: 'pointer',
+                border: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
               }}
             >
-              (too late chief)
+              <span>📸</span>
+              <span>Follow @arvykrane on Instagram</span>
+              <span>↗</span>
             </motion.button>
           </motion.div>
         ) : (
+
           <motion.button
             key="button"
             ref={btnRef}
@@ -141,7 +162,7 @@ export default function RunawayButton({ onAttempt }: RunawayButtonProps) {
             transition={{ type: 'spring', stiffness: 450, damping: 22 }}
             onMouseEnter={dodge}
             onTouchStart={handleTouchStart}
-            onClick={handleClick}
+            onClick={dodge}
             style={{
               padding: '10px 24px',
               borderRadius: '9999px',

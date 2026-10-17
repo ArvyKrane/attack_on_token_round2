@@ -14,6 +14,7 @@ import RunawayButton from './components/RunawayButton';
 import RoastButton from './components/RoastButton';
 import EmojiRain from './components/EmojiRain';
 import RickrollTrap from './components/RickrollTrap';
+import MimicContact from './components/MimicContact';
 import CookieBanner from './components/CookieBanner';
 import FakeError from './components/FakeError';
 import Bsod from './components/Bsod';
@@ -458,6 +459,9 @@ export default function App() {
 
                   {/* Resume PDF Download (Triggers Rickroll trap after fake 99% load) */}
                   <RickrollTrap />
+
+                  {/* Dark Souls Mimic Contact Button (Bites on click, triggers YOU DIED, contact works after) */}
+                  <MimicContact />
                 </div>
 
                 {/* Developer Follow & Endorse Row */}
@@ -823,54 +827,85 @@ export default function App() {
             </>
           )}
 
-          {/* Dark Souls You Died Screen */}
+          {/* Dark Souls Authentic You Died Screen */}
           <AnimatePresence>
             {diedVisible && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
+                transition={{ duration: 1.2 }}
                 style={{
                   position: 'fixed',
                   inset: 0,
                   zIndex: 9999,
-                  backgroundColor: 'rgba(0, 0, 0, 0.95)',
+                  backgroundColor: 'rgba(0, 0, 0, 0.96)',
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  padding: '20px',
                 }}
               >
-                <p
-                  className="font-pixel"
+                <motion.p
+                  initial={{ scale: 1.4, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 1.8, ease: 'easeOut' }}
                   style={{
+                    fontFamily: '"Cinzel", "Times New Roman", "Georgia", serif',
+                    letterSpacing: '0.22em',
                     color: '#8B0000',
-                    fontSize: 'clamp(2.5rem, 8vw, 5rem)',
-                    textShadow: '0 0 40px #8B0000',
+                    fontSize: 'clamp(2.8rem, 10vw, 6rem)',
+                    textShadow: '0 0 50px rgba(139, 0, 0, 0.9), 0 0 100px rgba(100, 0, 0, 0.7)',
                     textAlign: 'center',
-                    marginBottom: '16px',
+                    fontWeight: 700,
+                    marginBottom: '12px',
+                    textTransform: 'uppercase',
                   }}
                 >
                   YOU DIED
-                </p>
-                <p style={{ color: 'rgba(245,245,245,0.6)', marginBottom: '24px' }}>
-                  Aura reached 0. Certified NPC moment.
-                </p>
-                <button
-                  onClick={hideDied}
+                </motion.p>
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1.2, duration: 0.8 }}
                   style={{
-                    background: '#8B0000',
-                    color: '#fff',
-                    border: 'none',
-                    padding: '10px 24px',
-                    fontFamily: 'Press Start 2P, monospace',
-                    fontSize: '0.8rem',
-                    cursor: 'pointer',
-                    borderRadius: '4px',
+                    color: 'rgba(245, 245, 245, 0.6)',
+                    fontSize: 'clamp(0.85rem, 2.5vw, 1.1rem)',
+                    fontFamily: 'monospace',
+                    marginBottom: '28px',
+                    textAlign: 'center',
                   }}
                 >
-                  RESPAWN (+30 AURA)
-                </button>
+                  Aura reached 0 // The Mimic tore through your firewall.
+                </motion.p>
+                <motion.div
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1.8, duration: 0.6 }}
+                  style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}
+                >
+                  <button
+                    onClick={hideDied}
+                    style={{
+                      padding: '12px 32px',
+                      borderRadius: '9999px',
+                      fontFamily: 'monospace',
+                      fontWeight: 700,
+                      color: '#fef3c7',
+                      background: 'radial-gradient(circle, #78350f 0%, #451a03 100%)',
+                      border: '2px solid #f59e0b',
+                      boxShadow: '0 0 30px rgba(245, 158, 11, 0.4), inset 0 0 15px rgba(0,0,0,0.8)',
+                      letterSpacing: '0.08em',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    🔥 REST AT BONFIRE (REVIVE +30 AURA)
+                  </button>
+                  <span style={{ fontSize: '0.75rem', color: '#6b7280', fontFamily: 'monospace' }}>
+                    [ Press Left-Ctrl or click Bonfire to return ]
+                  </span>
+                </motion.div>
               </motion.div>
             )}
           </AnimatePresence>

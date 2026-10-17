@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
+import RealResumeModal from './RealResumeModal';
 
 interface CleanProfileProps {
   onSwitchToChaos?: () => void;
@@ -51,6 +53,7 @@ const SKILL_CATEGORIES = [
 ];
 
 export default function CleanProfile({ onSwitchToChaos }: CleanProfileProps) {
+  const [resumeModalOpen, setResumeModalOpen] = useState(false);
   return (
     <motion.section
       initial={{ opacity: 0 }}
@@ -176,6 +179,25 @@ export default function CleanProfile({ onSwitchToChaos }: CleanProfileProps) {
 
         {/* Social / Contact Links */}
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}>
+          <button
+            onClick={() => setResumeModalOpen(true)}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '8px 20px',
+              borderRadius: '9999px',
+              background: '#39ff14',
+              color: '#000',
+              border: 'none',
+              fontSize: '0.9rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              boxShadow: '0 0 16px rgba(57, 255, 20, 0.4)',
+            }}
+          >
+            📄 View / Download Resume (PDF)
+          </button>
           <a
             href="https://github.com/ArvyKrane"
             target="_blank"
@@ -197,7 +219,7 @@ export default function CleanProfile({ onSwitchToChaos }: CleanProfileProps) {
             🐙 GitHub
           </a>
           <a
-            href="https://instagram.com"
+            href="https://instagram.com/arvykrane"
             target="_blank"
             rel="noreferrer"
             style={{
@@ -416,6 +438,10 @@ export default function CleanProfile({ onSwitchToChaos }: CleanProfileProps) {
       >
         © 2026 Arvy Krane · Built with React, TypeScript & Vite · Clean Mode
       </footer>
+
+      {/* Verified Real Resume Modal */}
+      <RealResumeModal isOpen={resumeModalOpen} onClose={() => setResumeModalOpen(false)} />
     </motion.section>
   );
 }
+

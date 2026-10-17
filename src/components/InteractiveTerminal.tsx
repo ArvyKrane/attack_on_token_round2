@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useChaos } from '../store/useChaos';
-import { unlockAudio, playError, playDing, playVineBoom, playAirhorn, playCoin, speakRoast } from '../lib/sound';
+import { unlockAudio, playError, playDing, playVineBoom, playAirhorn, playCoin, speakRoast, playBiteCrunch, playDarkSoulsBell } from '../lib/sound';
 
 interface HistoryItem {
   command: string;
@@ -15,7 +15,7 @@ export default function InteractiveTerminal() {
       output: 'Arch Linux Workstation v6.9-arch1 (tty1). Type "help" for commands or "matrix" for rain.',
     },
   ]);
-  const { visitorName, aura, triggerEmojiRain, showRickroll, showBsod, spawnFakeError } = useChaos();
+  const { visitorName, aura, triggerEmojiRain, showRickroll, showBsod, spawnFakeError, drainAura, showDied } = useChaos();
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -50,6 +50,8 @@ export default function InteractiveTerminal() {
           <br />• <span style={{ color: '#39ff14' }}>roast</span> — Synthesize voice insult
           <br />• <span style={{ color: '#39ff14' }}>rickroll</span> — Critical vulnerability audit
           <br />• <span style={{ color: '#39ff14' }}>diagnostics</span> — Run memory leak test
+          <br />• <span style={{ color: '#ff1744' }}>horror</span> — 666 Daemon invocation
+          <br />• <span style={{ color: '#d4af37' }}>mimic</span> — Open suspicious dungeon chest
           <br />• <span style={{ color: '#39ff14' }}>clear</span> — Flush terminal buffer
         </div>
       );
@@ -105,6 +107,26 @@ export default function InteractiveTerminal() {
     } else if (lower === 'bsod') {
       showBsod();
       out = <span style={{ color: '#0055ff' }}>Executing hardware level fault...</span>;
+    } else if (lower === 'horror' || lower === '666' || lower === 'curse' || lower === 'blood') {
+      playBiteCrunch();
+      playDarkSoulsBell();
+      drainAura(25);
+      out = (
+        <div style={{ color: '#ff1744', fontFamily: 'monospace', lineHeight: 1.35, whiteSpace: 'pre-wrap' }}>
+{`☠️ [FATAL ENTITY INVOCATION: 0x666]
+   .---.
+  /     \\     THE SHADOW PROCESS IS UNLEASHED.
+ | () () |    Aura corrupted (-25).
+  \\  _  /     SOMETHING BREATHES BEHIND THE MONITOR.
+   \`---\``}
+        </div>
+      );
+    } else if (lower === 'mimic' || lower === 'chest') {
+      playBiteCrunch();
+      playDarkSoulsBell();
+      drainAura(100);
+      showDied();
+      out = <span style={{ color: '#8B0000', fontWeight: 'bold' }}>THE CHEST BIT YOUR WHOLE HAND OFF. YOU DIED.</span>;
     } else {
       playError();
       out = (
