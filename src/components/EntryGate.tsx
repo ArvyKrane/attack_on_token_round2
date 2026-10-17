@@ -2,41 +2,50 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { unlockAudio, playVineBoom, playDing } from '../lib/sound';
 
-// The real Enter button is randomly positioned each load
-const REAL_POSITIONS = ['top-left', 'top-right', 'bottom-left', 'bottom-right', 'center'] as const;
-type Position = typeof REAL_POSITIONS[number];
-
-function getPositionStyle(pos: Position): React.CSSProperties {
-  switch (pos) {
-    case 'top-left':     return { top: '15%', left: '10%' };
-    case 'top-right':    return { top: '15%', right: '10%' };
-    case 'bottom-left':  return { bottom: '20%', left: '10%' };
-    case 'bottom-right': return { bottom: '20%', right: '10%' };
-    case 'center':       return { top: '55%', left: '50%', transform: 'translate(-50%, -50%)' };
-  }
-}
-
 interface EntryGateProps {
   onEnter: () => void;
 }
 
-export default function EntryGate({ onEnter }: EntryGateProps) {
-  const [realPos] = useState<Position>(
-    () => REAL_POSITIONS[Math.floor(Math.random() * REAL_POSITIONS.length)]
-  );
-  const [shaking, setShaking] = useState(false);
-  const [attempts, setAttempts] = useState(0);
+const TROLL_BUTTON_LABELS = [
+  'Enter',
+  'Enter (for real)',
+  'Enter (definitely works this time)',
+  'Entering...',
+];
 
-  // Shake page when wrong button is clicked
-  const handleFakeClick = () => {
+const TROLL_MESSAGES = [
+  '',
+  'hm... page shook. vibe check failed.',
+  'still not it chief. skill issue.',
+  'fine, you win. entering...',
+];
+
+export default function EntryGate({ onEnter }: EntryGateProps) {
+  const [shaking, setShaking] = useState(false);
+  const [clicks, setClicks] = useState(0);
+
+  const handleEnterClick = () => {
     unlockAudio();
-    playDing();
-    setShaking(true);
-    setAttempts(a => a + 1);
-    setTimeout(() => setShaking(false), 520);
+    const nextClicks = clicks + 1;
+    setClicks(nextClicks);
+
+    if (nextClicks < 3) {
+      // Troll: shake and tease
+      playDing();
+      setShaking(true);
+      setTimeout(() => setShaking(false), 520);
+    } else {
+      // 3rd click lets them in!
+      playVineBoom();
+      setShaking(true);
+      setTimeout(() => {
+        setShaking(false);
+        onEnter();
+      }, 300);
+    }
   };
 
-  const handleRealClick = () => {
+  const handleBypassClick = () => {
     unlockAudio();
     playVineBoom();
     onEnter();
@@ -44,23 +53,27 @@ export default function EntryGate({ onEnter }: EntryGateProps) {
 
   return (
     <motion.div
-      className={`fixed inset-0 z-[9999] flex items-center justify-center ${shaking ? 'shake' : ''}`}
+      className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center min-h-screen w-full px-6 select-none ${shaking ? 'shake' : ''}`}
       style={{
-        background: 'radial-gradient(ellipse 80% 60% at 50% 50%, rgba(57,255,20,0.06) 0%, transparent 70%), var(--color-bg)',
+        background: 'radial-gradient(ellipse 80% 60% at 50% 50%, rgba(57,255,20,0.08) 0%, transparent 70%), var(--color-bg)',
       }}
     >
-      {/* Grain */}
+      {/* Grain overlay */}
       <div className="grain-overlay" />
 
-      {/* Center content */}
-      <div className="text-center z-10 px-6">
+      {/* Main Content */}
+      <div className="flex flex-col items-center justify-center text-center z-10 max-w-2xl mx-auto">
         <motion.h1
-          initial={{ opacity: 0, y: -30 }}
+          initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-          className="font-display font-bold glitch-text glow-acid mb-4"
+          transition={{ duration: 0.5 }}
+          className="font-display font-black glitch-text glow-acid mb-4 tracking-wider"
           data-text="RAGEBAIT.EXE"
-          style={{ fontSize: 'clamp(2.5rem, 10vw, 5rem)', color: 'var(--color-acid)' }}
+          style={{
+            fontSize: 'clamp(2.5rem, 8vw, 5.5rem)',
+            color: 'var(--color-acid)',
+            lineHeight: 1.1,
+          }}
         >
           RAGEBAIT.EXE
         </motion.h1>
@@ -68,22 +81,19 @@ export default function EntryGate({ onEnter }: EntryGateProps) {
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="font-display mb-12"
+          transition={{ delay: 0.2 }}
+          className="font-display font-medium mb-10 tracking-wide"
           style={{ fontSize: 'var(--text-lg)', color: 'var(--color-muted)' }}
         >
           a premium portfolio experience™
         </motion.p>
 
-        {/* The fake "Enter" button in the center — clicking shakes page */}
+        {/* The Troll Enter Button */}
         <motion.button
-          onClick={handleFakeClick}
+          onClick={handleEnterClick}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.7, type: 'spring' }}
-          className="px-10 py-4 rounded-full font-display font-bold text-black"
+          className="px-10 py-4 rounded-full font-display font-bold text-black select-none shadow-2xl transition-all"
           style={{
             background: 'var(--color-acid)',
             boxShadow: 'var(--glow-green)',
@@ -91,41 +101,48 @@ export default function EntryGate({ onEnter }: EntryGateProps) {
             cursor: 'pointer',
           }}
         >
-          Enter
+          {TROLL_BUTTON_LABELS[Math.min(clicks, TROLL_BUTTON_LABELS.length - 1)]}
         </motion.button>
 
-        {attempts > 0 && (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="mt-4 font-pixel"
-            style={{ fontSize: '0.6rem', color: 'var(--color-muted)' }}
-          >
-            {attempts === 1 ? 'hm.' : attempts < 4 ? 'still not it chief' : 'bro.'}
-          </motion.p>
+        {/* Troll Status Feedback */}
+        <div className="h-10 mt-5 flex items-center justify-center">
+          {clicks > 0 && (
+            <motion.p
+              key={clicks}
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="font-pixel text-center"
+              style={{
+                fontSize: '0.75rem',
+                color: clicks >= 3 ? 'var(--color-acid)' : 'var(--color-pink)',
+              }}
+            >
+              {TROLL_MESSAGES[Math.min(clicks, TROLL_MESSAGES.length - 1)]}
+            </motion.p>
+          )}
+        </div>
+
+        {clicks > 0 && clicks < 3 && (
+          <p className="text-xs font-pixel text-muted opacity-50 mt-1" style={{ color: 'var(--color-muted)' }}>
+            [hit it {3 - clicks} more {3 - clicks === 1 ? 'time' : 'times'} or use secret bypass below]
+          </p>
         )}
       </div>
 
-      {/* The REAL enter button — randomly placed */}
+      {/* Secret Bypass Button — clearly positioned at bottom corner, no overlap */}
       <motion.button
-        onClick={handleRealClick}
+        onClick={handleBypassClick}
         initial={{ opacity: 0 }}
-        animate={{ opacity: 0.7 }}
-        whileHover={{ opacity: 1, scale: 1.1 }}
-        transition={{ delay: 1.2 }}
-        className="absolute font-pixel"
+        animate={{ opacity: 0.6 }}
+        whileHover={{ opacity: 1, scale: 1.05 }}
+        className="fixed bottom-6 right-6 font-pixel z-20 text-xs px-3 py-2 rounded border border-white/20 text-white/50 hover:text-acid hover:border-acid transition-colors"
         style={{
-          ...getPositionStyle(realPos),
-          fontSize: '0.55rem',
-          color: 'var(--color-muted)',
-          background: 'transparent',
-          border: '1px solid rgba(255,255,255,0.15)',
-          padding: '6px 12px',
-          borderRadius: 4,
+          background: 'rgba(0,0,0,0.5)',
           cursor: 'pointer',
         }}
+        title="Secret bypass"
       >
-        actually enter
+        actually enter &rarr;
       </motion.button>
     </motion.div>
   );
