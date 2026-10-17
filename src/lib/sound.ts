@@ -240,3 +240,30 @@ export function playDegauss(): void {
   }
 }
 
+/** Sinister minor dissonance for psychological/tamed card */
+export function playSinisterChime(): void {
+  unlockAudio();
+  if (_muted) return;
+  try {
+    const ctx = getCtx();
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.85, now());
+    g.gain.exponentialRampToValueAtTime(0.0001, now() + 2.4);
+    g.connect(masterGain!);
+
+    // Ominous minor triad: C3 (130.81), Eb3 (155.56), F#3 (185.00)
+    [130.81, 155.56, 185.00].forEach(freq => {
+      const o = ctx.createOscillator();
+      o.type = 'sawtooth';
+      o.frequency.setValueAtTime(freq, now());
+      o.frequency.exponentialRampToValueAtTime(freq * 0.95, now() + 2.4);
+      o.connect(g);
+      o.start(now());
+      o.stop(now() + 2.4);
+    });
+  } catch (e) {
+    console.warn('Sinister chime error:', e);
+  }
+}
+
+

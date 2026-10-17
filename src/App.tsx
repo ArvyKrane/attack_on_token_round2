@@ -22,6 +22,7 @@ import ChatDave from './components/ChatDave';
 import LikeButton from './components/LikeButton';
 import SurrenderButton from './components/SurrenderButton';
 import CleanProfile from './components/CleanProfile';
+import InteractiveTerminal from './components/InteractiveTerminal';
 import {
   useKonamiCode,
   GodModeOverlay,
@@ -389,6 +390,9 @@ export default function App() {
                   </div>
                 </div>
               </div>
+
+              {/* Linux Interactive Shell / CLI Terminal */}
+              <InteractiveTerminal />
 
               {/* Linux Repositories Section */}
               <div>
