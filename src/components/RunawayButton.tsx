@@ -3,12 +3,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { unlockAudio, playScream } from '../lib/sound';
 
 const BUTTON_TEXTS = [
-  'Follow Me',
-  'FOLLOW',
+  '+ Follow Developer',
+  'Connecting...',
+  'Wait... Follow',
   'Click to Follow',
-  'Just Follow Bro',
-  'PLEASE',
-  'FOLLOW 😭',
+  'Quick, click me!',
+  'Too slow!',
+  'Almost got me',
+  'Skill issue...',
   'LAST CHANCE',
   'Fine.',
 ];
@@ -20,7 +22,6 @@ interface RunawayButtonProps {
 export default function RunawayButton({ onAttempt }: RunawayButtonProps) {
   const [attempts, setAttempts] = useState(0);
   const [pos, setPos] = useState({ x: 0, y: 0 });
-  const surrendered = false; // always false — surrender is handled at App level
   const [label, setLabel] = useState(BUTTON_TEXTS[0]);
   const btnRef = useRef<HTMLButtonElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -28,7 +29,7 @@ export default function RunawayButton({ onAttempt }: RunawayButtonProps) {
   const escaped = attempts >= 10;
 
   const dodge = useCallback((e: React.MouseEvent | React.TouchEvent) => {
-    if (escaped || surrendered) return;
+    if (escaped) return;
     unlockAudio();
     onAttempt();
 
@@ -43,7 +44,6 @@ export default function RunawayButton({ onAttempt }: RunawayButtonProps) {
     const W = rect.width;
     const H = rect.height;
 
-    // Pick a random position that avoids the cursor
     let cx = 0, cy = 0;
     if ('clientX' in e) {
       cx = e.clientX - rect.left;
@@ -53,24 +53,23 @@ export default function RunawayButton({ onAttempt }: RunawayButtonProps) {
     let nx: number, ny: number;
     let tries = 0;
     do {
-      nx = Math.random() * (W - 160);
-      ny = Math.random() * (H - 60);
+      nx = Math.random() * (W - 140);
+      ny = Math.random() * (H - 50);
       tries++;
-    } while (Math.hypot(nx - cx, ny - cy) < 150 && tries < 20);
+    } while (Math.hypot(nx - cx, ny - cy) < 140 && tries < 20);
 
     setPos({ x: nx - W / 2, y: ny - H / 2 });
-  }, [attempts, escaped, surrendered, onAttempt]);
+  }, [attempts, escaped, onAttempt]);
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    if (escaped || surrendered) return;
+    if (escaped) return;
     e.preventDefault();
-    // On touch: teleport instantly
     const container = containerRef.current;
     if (!container) return;
     const W = container.clientWidth;
     const H = container.clientHeight;
-    const nx = Math.random() * (W - 160);
-    const ny = Math.random() * (H - 60);
+    const nx = Math.random() * (W - 140);
+    const ny = Math.random() * (H - 50);
     setPos({ x: nx - W / 2, y: ny - H / 2 });
     setAttempts(a => {
       const na = a + 1;
@@ -78,7 +77,7 @@ export default function RunawayButton({ onAttempt }: RunawayButtonProps) {
       return na;
     });
     onAttempt();
-  }, [escaped, surrendered, onAttempt]);
+  }, [escaped, onAttempt]);
 
   const handleClick = useCallback(() => {
     if (!escaped) return;
@@ -88,29 +87,50 @@ export default function RunawayButton({ onAttempt }: RunawayButtonProps) {
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-48 flex items-center justify-center overflow-hidden"
+      style={{
+        position: 'relative',
+        width: '100%',
+        minHeight: '120px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden',
+        borderRadius: '12px',
+        background: 'rgba(255, 255, 255, 0.02)',
+        border: '1px dashed rgba(255, 255, 255, 0.1)',
+      }}
     >
       <AnimatePresence>
         {escaped ? (
           <motion.div
             key="escaped"
-            initial={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0, scale: 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="text-center"
+            style={{ textAlign: 'center', padding: '12px' }}
           >
             <p
-              className="font-pixel text-pink"
-              style={{ fontSize: 'var(--text-sm)', lineHeight: 1.8 }}
+              className="font-pixel"
+              style={{ fontSize: '0.8rem', color: '#ff1493', lineHeight: 1.6 }}
             >
-              nah you're not worthy 💀
+              nah you're not worthy to follow 💀
             </p>
             <motion.button
               onClick={handleClick}
               animate={{ scale: [1, 0.95, 1] }}
               transition={{ repeat: Infinity, duration: 2 }}
-              className="mt-4 px-6 py-2 rounded-full border border-pink-500/30 text-pink-400 text-sm cursor-not-allowed opacity-40"
+              style={{
+                marginTop: '8px',
+                padding: '6px 16px',
+                borderRadius: '9999px',
+                border: '1px solid rgba(255,20,147,0.3)',
+                color: '#ff1493',
+                fontSize: '0.75rem',
+                cursor: 'not-allowed',
+                background: 'transparent',
+                opacity: 0.5,
+              }}
             >
-              (too late)
+              (too late chief)
             </motion.button>
           </motion.div>
         ) : (
@@ -118,15 +138,23 @@ export default function RunawayButton({ onAttempt }: RunawayButtonProps) {
             key="button"
             ref={btnRef}
             animate={{ x: pos.x, y: pos.y }}
-            transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+            transition={{ type: 'spring', stiffness: 450, damping: 22 }}
             onMouseEnter={dodge}
             onTouchStart={handleTouchStart}
             onClick={handleClick}
-            className="px-8 py-3 rounded-full font-display font-semibold text-black cursor-pointer select-none whitespace-nowrap"
             style={{
-              background: 'var(--color-acid)',
-              boxShadow: 'var(--glow-green)',
-              fontSize: 'var(--text-base)',
+              padding: '10px 24px',
+              borderRadius: '9999px',
+              fontFamily: 'Space Grotesk, sans-serif',
+              fontWeight: 700,
+              color: '#000000',
+              background: '#39ff14',
+              boxShadow: '0 0 16px rgba(57, 255, 20, 0.4)',
+              fontSize: '0.9rem',
+              cursor: 'pointer',
+              border: 'none',
+              userSelect: 'none',
+              whiteSpace: 'nowrap',
             }}
           >
             {label}
@@ -135,12 +163,18 @@ export default function RunawayButton({ onAttempt }: RunawayButtonProps) {
       </AnimatePresence>
 
       {attempts > 0 && !escaped && (
-        <p
-          className="absolute bottom-2 text-xs text-muted opacity-60"
-          style={{ color: 'var(--color-muted)' }}
+        <span
+          className="font-pixel"
+          style={{
+            position: 'absolute',
+            bottom: '6px',
+            right: '12px',
+            fontSize: '0.55rem',
+            color: 'rgba(245,245,245,0.4)',
+          }}
         >
-          attempts: {attempts}/10
-        </p>
+          evaded: {attempts}/10
+        </span>
       )}
     </div>
   );

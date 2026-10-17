@@ -43,59 +43,70 @@ export default function RoastButton() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px', width: '100%', maxWidth: '480px', margin: '0 auto' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', width: '100%', maxWidth: '440px' }}>
       <motion.button
         onClick={handleClick}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.92 }}
-        className={`px-8 py-3.5 rounded-full font-display font-bold text-white select-none ${shaking ? 'shake' : ''}`}
+        whileHover={{ scale: 1.03 }}
+        whileTap={{ scale: 0.94 }}
+        className={shaking ? 'shake' : ''}
         style={{
-          background: 'linear-gradient(135deg, #ff1493 0%, #9900ef 100%)',
-          boxShadow: '0 0 20px rgba(255,20,147,0.5)',
-          fontSize: '1.05rem',
+          padding: '12px 26px',
+          borderRadius: '10px',
+          fontFamily: 'Space Grotesk, sans-serif',
+          fontWeight: 700,
+          fontSize: '0.92rem',
+          color: '#ffffff',
+          background: 'linear-gradient(135deg, rgba(255,20,147,0.85) 0%, rgba(147,51,234,0.85) 100%)',
+          border: '1px solid rgba(255, 20, 147, 0.5)',
+          boxShadow: '0 4px 20px rgba(255, 20, 147, 0.3)',
           cursor: 'pointer',
-          border: 'none',
-          outline: 'none',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '8px',
+          backdropFilter: 'blur(8px)',
         }}
       >
-        💥 Click Me for Roast & Sound
+        <span>⚡</span>
+        <span>Endorse Developer & Run Vibe Check</span>
       </motion.button>
 
       <AnimatePresence mode="wait">
         {roast && (
           <motion.div
             key={roast.text}
-            initial={{ opacity: 0, y: 12, scale: 0.92 }}
+            initial={{ opacity: 0, y: 10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+            exit={{ opacity: 0, y: -8, scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 500, damping: 28 }}
-            className="glass-card"
             style={{
-              padding: '16px 24px',
+              padding: '14px 20px',
               width: '100%',
+              borderRadius: '12px',
               textAlign: 'center',
-              border: '1px solid rgba(255, 20, 147, 0.5)',
+              background: 'rgba(255, 20, 147, 0.08)',
+              border: '1px solid rgba(255, 20, 147, 0.4)',
               boxShadow: '0 4px 24px rgba(255, 20, 147, 0.15)',
+              backdropFilter: 'blur(12px)',
             }}
           >
             <span
               className="font-pixel"
               style={{
                 display: 'inline-block',
-                fontSize: '0.6rem',
+                fontSize: '0.55rem',
                 textTransform: 'uppercase',
                 color: '#ff1493',
                 marginBottom: '6px',
                 letterSpacing: '1px',
               }}
             >
-              [{roast.category}]
+              [VIBE EVALUATION REPORT: {roast.category}]
             </span>
             <p
               className="font-display font-semibold"
               style={{
-                color: '#f5f5f5',
-                fontSize: '1.1rem',
+                color: '#ffffff',
+                fontSize: '1rem',
                 lineHeight: 1.4,
               }}
             >

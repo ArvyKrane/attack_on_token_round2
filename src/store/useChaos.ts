@@ -1,5 +1,5 @@
 // useChaos.ts — Zustand global chaos store
-// Tracks: aura points, click count, unlocked pranks, surrender state
+// Tracks: aura points, click count, unlocked pranks, surrender state, bypass
 
 import { create } from 'zustand';
 
@@ -51,6 +51,9 @@ export interface ChaosState {
   surrendered: boolean;
   surrender: () => void;
 
+  // Bypass active pranks (via Left Ctrl)
+  bypassPranks: () => void;
+
   // Dark Souls DIED screen
   diedVisible: boolean;
   showDied: () => void;
@@ -86,23 +89,19 @@ export const useChaos = create<ChaosState>((set, get) => ({
   incrementClicks: () => {
     const next = get().clickCount + 1;
     set({ clickCount: next });
-    // Drain aura per click
-    get().drainAura(3);
-    // Trigger emoji rain after 5 clicks
+    get().drainAura(2);
     if (next === 5) get().triggerEmojiRain();
-    // Spawn a fake error dialog randomly
-    if (next > 3 && Math.random() < 0.25) get().spawnFakeError();
-    // Show visitor popup after 8 clicks
+    if (next > 4 && Math.random() < 0.25) get().spawnFakeError();
     if (next === 8) get().showVisitorPopup();
   },
 
   fakeErrors: 0,
-  spawnFakeError: () => set(s => ({ fakeErrors: s.fakeErrors + 1 })),
+  spawnFakeError: () => set(s => ({ fakeErrors: Math.min(s.fakeErrors + 1, 10) })),
   closeFakeError: () => {
     const cur = get().fakeErrors;
     if (cur > 0) {
-      // Closing spawns 2 more
-      set({ fakeErrors: cur - 1 + 2 });
+      // Closing spawns 2 more per spec
+      set({ fakeErrors: Math.min(cur - 1 + 2, 10) });
     }
   },
 
@@ -139,6 +138,20 @@ export const useChaos = create<ChaosState>((set, get) => ({
   showEmergencyMeeting: () => set({ emergencyMeetingVisible: true }),
   hideEmergencyMeeting: () => set({ emergencyMeetingVisible: false }),
 
+  bypassPranks: () => {
+    set({
+      fakeErrors: 0,
+      bsodVisible: false,
+      captchaVisible: false,
+      emergencyMeetingVisible: false,
+      wastedVisible: false,
+      scrollInverted: false,
+      visitorPopupVisible: false,
+      diedVisible: false,
+      emojiRainActive: false,
+    });
+  },
+
   surrendered: false,
   surrender: () => set({
     surrendered: true,
@@ -159,7 +172,6 @@ export const useChaos = create<ChaosState>((set, get) => ({
   diedVisible: false,
   showDied: () => set({ diedVisible: true }),
   hideDied: () => {
-    // Respawn: restore aura to 30
     set({ diedVisible: false, aura: 30 });
   },
 

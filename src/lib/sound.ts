@@ -214,3 +214,29 @@ export function speakRoast(text: string): void {
     console.warn('Speech synthesis error:', e);
   }
 }
+
+/** CRT Degauss sound effect */
+export function playDegauss(): void {
+  unlockAudio();
+  if (_muted) return;
+  try {
+    const ctx = getCtx();
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.8, now());
+    g.gain.exponentialRampToValueAtTime(0.0001, now() + 1.2);
+    g.connect(masterGain!);
+
+    const o = ctx.createOscillator();
+    o.type = 'triangle';
+    o.frequency.setValueAtTime(140, now());
+    o.frequency.exponentialRampToValueAtTime(30, now() + 1.2);
+    o.connect(g);
+    o.start(now());
+    o.stop(now() + 1.2);
+
+    noise(0.35, 0.35);
+  } catch (e) {
+    console.warn('Degauss error:', e);
+  }
+}
+
